@@ -1,0 +1,148 @@
+library community.lvecode.trevordevore.sparkle
+
+  use com.livecode.foreign
+  use com.livecode.objc
+  use com.livecode.engine
+
+  metadata title is "Sparkle"
+  metadata author is "TrevorDeVore"
+  metadata version is "0.0.1"
+
+  private foreign handler ObjC_SUUpdaterSharedUpdater() \
+        returns ObjcId \
+        binds to "objc:Sparkle.framework>SUUpdater.+sharedUpdater"
+
+  private foreign handler ObjC_SUUpdaterSetDelegate (in pSUUpdater as ObjcId, in pDelegate as ObjcId) \
+        returns nothing \
+        binds to "objc:Sparkle.framework>SUUpdater.-setDelegate:"
+
+  private foreign handler ObjC_SUUpdaterAutomaticChecking (in pSUUpdater as ObjcId) \
+        returns CBool \
+        binds to "objc:Sparkle.framework>SUUpdater.-automaticallyChecksForUpdates"
+  private foreign handler ObjC_SUUpdaterUpdaterMayCheckForUpdates (in pSUUpdater as ObjcId) \
+        returns CBool \
+        binds to "objc:Sparkle.framework>SUUpdater.-updaterMayCheckForUpdates"
+  private foreign handler ObjC_SUUpdaterAutomaticallyChecksForUpdates (in pSUUpdater as ObjcId) \
+        returns CBool \
+        binds to "objc:Sparkle.framework>SUUpdater.-automaticallyChecksForUpdates"
+  private foreign handler ObjC_SUUpdaterAutomaticallyDownloadsUpdates (in pSUUpdater as ObjcId) \
+        returns CBool \
+        binds to "objc:Sparkle.framework>SUUpdater.-automaticallyDownloadsUpdates"
+  -- (NSURL *)feedURL
+  private foreign handler ObjC_SUUpdaterFeedURL (in pSUUpdater as ObjcId) \
+        returns ObjcId \
+        binds to "objc:Sparkle.framework>SUUpdater.-feedURL"
+  -- (NSString *)userAgentString
+  private foreign handler ObjC_SUUpdaterUserAgentString (in pSUUpdater as ObjcId) \
+        returns ObjcId \
+        binds to "objc:Sparkle.framework>SUUpdater.-userAgentString"
+  private foreign handler ObjC_SUUpdaterSendsSystemProfile (in pSUUpdater as ObjcId) \
+        returns CBool \
+        binds to "objc:Sparkle.framework>SUUpdater.-sendsSystemProfile"
+  -- (NSURL *)parameterizedFeedURL
+  private foreign handler ObjC_SUUpdaterParameterizedFeedURL (in pSUUpdater as ObjcId) \
+        returns ObjcId \
+        binds to "objc:Sparkle.framework>SUUpdater.-parameterizedFeedURL"
+  -- (NSTimeInterval)updateCheckInterval
+  private foreign handler ObjC_SUUpdaterUpdateCheckInterval (in pSUUpdater as ObjcId) \
+        returns ObjcId \
+        binds to "objc:Sparkle.framework>SUUpdater.-updateCheckInterval"
+  private foreign handler ObjC_SUUpdaterUpdateInProgress (in pSUUpdater as ObjcId) \
+        returns CBool \
+        binds to "objc:Sparkle.framework>SUUpdater.-updateInProgress"
+
+  variable mSUUpdaterDelegate as optional ObjcObject
+
+
+  public handler sparkleInitialize() returns nothing
+    variable sharedUpdater as ObjcObject
+
+    unsafe
+      put ObjC_SUUpdaterSharedUpdater() into sharedUpdater
+      SetSUUpdaterDelegate(sharedUpdater)
+    end unsafe
+  end handler
+
+
+  unsafe handler SetSUUpdaterDelegate(in pSUUpdater as ObjcObject) returns nothing
+    variable tDelegate as optional ObjcObject
+    variable tMapping as Array
+
+    put {"updater:didFinishLoadingAppcast:": DidFinishLoadingAppcast, \
+          "updater:didFindValidUpdate:": DidFindValidUpdate, \
+          "updaterDidNotFindUpdate:": DidNotFindUpdate, \
+          "updater:willInstallUpdate:": WillInstallUpdate, \
+          "updaterWillRelaunchApplication:": WillRelaunchApplication, \
+          "updaterWillShowModalAlert:": WillShowModalAlert, \
+          "updaterDidShowModalAlert:": DidShowModalAlert} into tMapping
+
+    put CreateObjcDelegate( \
+              "SUUpdaterDelegate", \
+              tMapping) into tDelegate
+
+    if tDelegate is not nothing then
+      put tDelegate into mSUUpdaterDelegate
+      ObjC_SUUpdaterSetDelegate(pSUUpdater, mSUUpdaterDelegate)
+    end if
+  end handler
+
+
+  public handler sparkleGetAutomaticChecking() returns Boolean
+    variable sharedUpdater as ObjcObject
+
+    unsafe
+      put ObjC_SUUpdaterSharedUpdater() into sharedUpdater
+      return ObjC_SUUpdaterAutomaticChecking(sharedUpdater)
+    end unsafe
+  end handler
+
+
+  public handler sparkleGetUpdaterMayCheckForUpdates() returns Boolean
+    variable sharedUpdater as ObjcObject
+
+    unsafe
+      put ObjC_SUUpdaterSharedUpdater() into sharedUpdater
+      return ObjC_SUUpdaterUpdaterMayCheckForUpdates(sharedUpdater)
+    end unsafe
+  end handler
+
+
+  public handler sparkleSetUpdaterMayCheckForUpdates(in pBoolean as Boolean) returns nothing
+    variable sharedUpdater as ObjcObject
+
+    unsafe
+      put ObjC_SUUpdaterSharedUpdater() into sharedUpdater
+      -- return ObjC_SUUpdaterSetUpdaterMayCheckForUpdates(sharedUpdater, pBoolean)
+    end unsafe
+  end handler
+
+
+  private handler DidFinishLoadingAppcast(in pNotification as ObjcObject) returns nothing
+    post "sparkleFinishedLoadingAppcast"
+  end handler
+
+  private handler DidFindValidUpdate(in pNotification as ObjcObject) returns nothing
+    post "sparkleFoundUpdate"
+  end handler
+
+  private handler DidNotFindUpdate(in pNotification as ObjcObject) returns nothing
+    post "sparkleDidNotFindUpdate"
+  end handler
+
+  private handler WillInstallUpdate(in pNotification as ObjcObject) returns nothing
+    post "sparkleWillInstallUpdate"
+  end handler
+
+  private handler WillRelaunchApplication(in pNotification as ObjcObject) returns nothing
+    post "sparkleWillRelaunchApplication"
+  end handler
+
+  private handler WillShowModalAlert(in pNotification as ObjcObject) returns nothing
+    post "sparkleWillShowModalAlert"
+  end handler
+
+  private handler DidShowModalAlert(in pNotification as ObjcObject) returns nothing
+    post "sparkleDidShowModalAlert"
+  end handler
+
+end library
