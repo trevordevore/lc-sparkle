@@ -126,6 +126,11 @@ library community.lvecode.trevordevore.sparkle
   private foreign handler ObjC_NSBundleIdentifier(in pObj as ObjcId) \
         returns ObjcId binds to "objc:NSBundle.-bundleIdentifier"
 
+  private foreign handler ObjC_NSErrorLocalizedFailureReason(in pObj as ObjcId) \
+        returns ObjcId binds to "objc:NSError.-localizedFailureReason"
+  private foreign handler ObjC_NSErrorLocalizedDescription(in pObj as ObjcId) \
+        returns ObjcId binds to "objc:NSError.-localizedDescription"
+
   /* VARIABLES */
   variable mSharedUpdater as optional ObjcObject
   variable mSUUpdaterDelegate as optional ObjcObject
@@ -143,10 +148,12 @@ library community.lvecode.trevordevore.sparkle
   Returns: nothing
   */
   public handler sparkleInitialize() returns nothing
-    unsafe
-      put ObjC_SUUpdaterSharedUpdater() into mSharedUpdater
-      SetSUUpdaterInformalDelegate(mSharedUpdater)
-    end unsafe
+    if mSharedUpdater is nothing then
+      unsafe
+        put ObjC_SUUpdaterSharedUpdater() into mSharedUpdater
+        SetSUUpdaterInformalDelegate(mSharedUpdater)
+      end unsafe
+    end if
   end handler
 
 
@@ -562,12 +569,10 @@ library community.lvecode.trevordevore.sparkle
   end handler
 
   private handler DidFindValidUpdate(in pUpdater as ObjcId, in pAppcastItem as ObjcId) returns nothing
-    log "sparkleFoundUpdate"
     post "sparkleFoundUpdate"
   end handler
 
   private handler DidNotFindUpdate(in pUpdater as ObjcId) returns nothing
-    log "sparkleDidNotFindUpdate"
     post "sparkleDidNotFindUpdate"
   end handler
 
@@ -604,12 +609,30 @@ library community.lvecode.trevordevore.sparkle
 
   // - (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)item;
   private handler DidCancelInstallUpdateOnQuit(in pUpdater as ObjcId, in pAppcastItem as ObjcId) returns nothing
+    // TODO: Convert appcastitem to array that is passed as parameter
     post "sparkelDidCancelInstallUpdateOnQuit"
   end handler
 
   // - (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error;
   private handler DidAbortWithError(in pUpdater as ObjcId, in pNSError as ObjcId) returns nothing
-    post "sparkleDidAbortWithError"
+    variable tFailureReason as optional ObjcObject
+    variable tDescription as optional ObjcObject
+    variable tError as Array
+
+    unsafe
+      put ObjC_NSErrorLocalizedFailureReason(pNSError) into tFailureReason
+      put ObjC_NSErrorLocalizedDescription(pNSError) into tDescription
+    end unsafe
+
+    if tDescription is not nothing then
+      put StringFromNSString(tDescription) into tError["description"]
+    end if
+    if tFailureReason is not nothing then
+      put StringFromNSString(tFailureReason) into tError["failure reason"]
+    end if
+    log tError
+
+    post "sparkleDidAbortWithError" with [tError]
   end handler
 
 end library
