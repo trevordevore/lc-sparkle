@@ -59,14 +59,39 @@ library community.lvecode.trevordevore.sparkle
 
     unsafe
       put ObjC_SUUpdaterSharedUpdater() into sharedUpdater
-      SetSUUpdaterDelegate(sharedUpdater)
+      SetSUUpdaterInformalDelegate(sharedUpdater)
     end unsafe
   end handler
 
 
-  unsafe handler SetSUUpdaterDelegate(in pSUUpdater as ObjcObject) returns nothing
+  foreign handler Delegate_SUUpdaterDidFinishLoadingAppcast (in pUpdater as ObjcId, in pAppcast as ObjcId) \
+        returns nothing binds to "objc:.-updater:didFinishLoadingAppcast:"
+  foreign handler Delegate_SUUpdaterDidFindValidUpdate (in pUpdater as ObjcId, in pAppcastItem as ObjcId) \
+        returns nothing binds to "objc:.-updater:didFindValidUpdate:"
+  foreign handler Delegate_SUUpdaterDidNotFindUpdate (in pUpdater as ObjcId) \
+        returns nothing binds to "objc:.-updaterDidNotFindUpdate:"
+  foreign handler Delegate_SUUpdaterWillInstallUpdate (in pUpdater as ObjcId, in pAppcastItem as ObjcId) \
+        returns nothing binds to "objc:.-updater:willInstallUpdate:"
+  foreign handler Delegate_SUUpdaterWillRelaunchApplication (in pUpdater as ObjcId) \
+        returns nothing binds to "objc:.-updaterWillRelaunchApplication:"
+  foreign handler Delegate_SUUpdaterWillShowModalAlert (in pUpdater as ObjcId) \
+        returns nothing binds to "objc:.-updaterWillShowModalAlert:"
+  foreign handler Delegate_SUUpdaterDidShowModalAlert (in pUpdater as ObjcId) \
+        returns nothing binds to "objc:.-updaterDidShowModalAlert:"
+
+
+  unsafe handler SetSUUpdaterInformalDelegate(in pSUUpdater as ObjcObject) returns nothing
     variable tDelegate as optional ObjcObject
+    variable tForeignHandlers as List
     variable tMapping as Array
+
+    put [Delegate_SUUpdaterDidFinishLoadingAppcast, \
+          Delegate_SUUpdaterDidFindValidUpdate, \
+          Delegate_SUUpdaterDidNotFindUpdate, \
+          Delegate_SUUpdaterWillInstallUpdate, \
+          Delegate_SUUpdaterWillRelaunchApplication, \
+          Delegate_SUUpdaterWillShowModalAlert, \
+          Delegate_SUUpdaterDidShowModalAlert] into tForeignHandlers
 
     put {"updater:didFinishLoadingAppcast:": DidFinishLoadingAppcast, \
           "updater:didFindValidUpdate:": DidFindValidUpdate, \
@@ -76,8 +101,8 @@ library community.lvecode.trevordevore.sparkle
           "updaterWillShowModalAlert:": WillShowModalAlert, \
           "updaterDidShowModalAlert:": DidShowModalAlert} into tMapping
 
-    put CreateObjcDelegate( \
-              "SUUpdaterDelegate", \
+    put CreateObjcInformalDelegate( \
+              tForeignHandlers, \
               tMapping) into tDelegate
 
     if tDelegate is not nothing then
@@ -117,31 +142,31 @@ library community.lvecode.trevordevore.sparkle
   end handler
 
 
-  private handler DidFinishLoadingAppcast(in pNotification as ObjcObject) returns nothing
+  handler DidFinishLoadingAppcast(in pUpdater as ObjcId, in pAppcast as ObjcId) returns nothing
     post "sparkleFinishedLoadingAppcast"
   end handler
 
-  private handler DidFindValidUpdate(in pNotification as ObjcObject) returns nothing
+  handler DidFindValidUpdate(in pUpdater as ObjcId, in pAppcastItem as ObjcId) returns nothing
     post "sparkleFoundUpdate"
   end handler
 
-  private handler DidNotFindUpdate(in pNotification as ObjcObject) returns nothing
+  handler DidNotFindUpdate(in pUpdater as ObjcId) returns nothing
     post "sparkleDidNotFindUpdate"
   end handler
 
-  private handler WillInstallUpdate(in pNotification as ObjcObject) returns nothing
+  handler WillInstallUpdate(in pUpdater as ObjcId, in pAppcastItem as ObjcId) returns nothing
     post "sparkleWillInstallUpdate"
   end handler
 
-  private handler WillRelaunchApplication(in pNotification as ObjcObject) returns nothing
+  handler WillRelaunchApplication(in pUpdater as ObjcId) returns nothing
     post "sparkleWillRelaunchApplication"
   end handler
 
-  private handler WillShowModalAlert(in pNotification as ObjcObject) returns nothing
+  handler WillShowModalAlert(in pUpdater as ObjcId) returns nothing
     post "sparkleWillShowModalAlert"
   end handler
 
-  private handler DidShowModalAlert(in pNotification as ObjcObject) returns nothing
+  handler DidShowModalAlert(in pUpdater as ObjcId) returns nothing
     post "sparkleDidShowModalAlert"
   end handler
 
