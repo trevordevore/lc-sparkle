@@ -10,46 +10,46 @@ library community.lvecode.trevordevore.sparkle
 
   private foreign handler ObjC_SUUpdaterSharedUpdater() \
         returns ObjcId \
-        binds to "objc:Sparkle.framework>SUUpdater.+sharedUpdater"
+        binds to "objc:Sparkle>SUUpdater.+sharedUpdater"
 
   private foreign handler ObjC_SUUpdaterSetDelegate (in pSUUpdater as ObjcId, in pDelegate as ObjcId) \
         returns nothing \
-        binds to "objc:Sparkle.framework>SUUpdater.-setDelegate:"
+        binds to "objc:Sparkle>SUUpdater.-setDelegate:"
 
   private foreign handler ObjC_SUUpdaterAutomaticChecking (in pSUUpdater as ObjcId) \
         returns CBool \
-        binds to "objc:Sparkle.framework>SUUpdater.-automaticallyChecksForUpdates"
+        binds to "objc:Sparkle>SUUpdater.-automaticallyChecksForUpdates"
   private foreign handler ObjC_SUUpdaterUpdaterMayCheckForUpdates (in pSUUpdater as ObjcId) \
         returns CBool \
-        binds to "objc:Sparkle.framework>SUUpdater.-updaterMayCheckForUpdates"
+        binds to "objc:Sparkle>SUUpdater.-updaterMayCheckForUpdates"
   private foreign handler ObjC_SUUpdaterAutomaticallyChecksForUpdates (in pSUUpdater as ObjcId) \
         returns CBool \
-        binds to "objc:Sparkle.framework>SUUpdater.-automaticallyChecksForUpdates"
+        binds to "objc:Sparkle>SUUpdater.-automaticallyChecksForUpdates"
   private foreign handler ObjC_SUUpdaterAutomaticallyDownloadsUpdates (in pSUUpdater as ObjcId) \
         returns CBool \
-        binds to "objc:Sparkle.framework>SUUpdater.-automaticallyDownloadsUpdates"
+        binds to "objc:Sparkle>SUUpdater.-automaticallyDownloadsUpdates"
   -- (NSURL *)feedURL
   private foreign handler ObjC_SUUpdaterFeedURL (in pSUUpdater as ObjcId) \
         returns ObjcId \
-        binds to "objc:Sparkle.framework>SUUpdater.-feedURL"
+        binds to "objc:Sparkle>SUUpdater.-feedURL"
   -- (NSString *)userAgentString
   private foreign handler ObjC_SUUpdaterUserAgentString (in pSUUpdater as ObjcId) \
         returns ObjcId \
-        binds to "objc:Sparkle.framework>SUUpdater.-userAgentString"
+        binds to "objc:Sparkle>SUUpdater.-userAgentString"
   private foreign handler ObjC_SUUpdaterSendsSystemProfile (in pSUUpdater as ObjcId) \
         returns CBool \
-        binds to "objc:Sparkle.framework>SUUpdater.-sendsSystemProfile"
+        binds to "objc:Sparkle>SUUpdater.-sendsSystemProfile"
   -- (NSURL *)parameterizedFeedURL
   private foreign handler ObjC_SUUpdaterParameterizedFeedURL (in pSUUpdater as ObjcId) \
         returns ObjcId \
-        binds to "objc:Sparkle.framework>SUUpdater.-parameterizedFeedURL"
+        binds to "objc:Sparkle>SUUpdater.-parameterizedFeedURL"
   -- (NSTimeInterval)updateCheckInterval
   private foreign handler ObjC_SUUpdaterUpdateCheckInterval (in pSUUpdater as ObjcId) \
         returns ObjcId \
-        binds to "objc:Sparkle.framework>SUUpdater.-updateCheckInterval"
+        binds to "objc:Sparkle>SUUpdater.-updateCheckInterval"
   private foreign handler ObjC_SUUpdaterUpdateInProgress (in pSUUpdater as ObjcId) \
         returns CBool \
-        binds to "objc:Sparkle.framework>SUUpdater.-updateInProgress"
+        binds to "objc:Sparkle>SUUpdater.-updateInProgress"
 
   variable mSUUpdaterDelegate as optional ObjcObject
 
