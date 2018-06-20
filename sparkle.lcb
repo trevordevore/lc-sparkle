@@ -1,5 +1,12 @@
 library community.lvecode.trevordevore.sparkle
 
+  /*
+  URLs of interest:
+
+  - https://sparkle-project.org/documentation/
+  - https://sparkle-project.org/documentation/customization/
+  */
+
   use com.livecode.foreign
   use com.livecode.objc
   use com.livecode.engine
@@ -14,6 +21,8 @@ library community.lvecode.trevordevore.sparkle
   private foreign handler ObjC_SUUpdaterSetDelegate (in pSUUpdater as ObjcId, in pDelegate as ObjcId) \
         returns nothing binds to "objc:Sparkle>SUUpdater.-setDelegate:"
 
+  private foreign handler ObjC_SUUpdaterCheckForUpdates (in pSUUpdater as ObjcId, in pSender as optional ObjcId) \
+        returns nothing binds to "objc:Sparkle>SUUpdater.-checkForUpdates:"
   private foreign handler ObjC_SUUpdaterCheckForUpdatesInBackground (in pSUUpdater as ObjcId) \
         returns nothing binds to "objc:Sparkle>SUUpdater.-checkForUpdatesInBackground"
   private foreign handler ObjC_SUUpdaterCheckForUpdateInformation (in pSUUpdater as ObjcId) \
@@ -106,6 +115,8 @@ library community.lvecode.trevordevore.sparkle
         returns nothing binds to "objc:.-updater:didCancelInstallUpdateOnQuit:"
   foreign handler Delegate_SUUpdaterDidAbortWithError (in pDelegate as ObjcId, in pUpdater as ObjcId, in pNSError as ObjcId) \
         returns nothing binds to "objc:.-updater:didAbortWithError:"
+  foreign handler Delegate_SUUpdaterShouldPostponeRelaunchForUpdate (in pDelegate as ObjcId, in pAppCastItem as ObjcId, in pNSInvocation as ObjcId) \
+        returns CBool binds to "objc:.-updater:shouldPostponeRelaunchForUpdate:untilInvoking:"
 
   /* ADDITIONAL HELPERS */
   private foreign handler ObjC_NSURLAlloc() \
@@ -154,6 +165,20 @@ library community.lvecode.trevordevore.sparkle
         SetSUUpdaterInformalDelegate(mSharedUpdater)
       end unsafe
     end if
+  end handler
+
+
+  /**
+  Summary: Checks for updates while displaying a UI.
+
+  Description:
+  This is meant to be called from a menu item as it will provide visual
+  feedback showing that a check is being performed.
+  */
+  public handler sparkleCheckForUpdates() returns nothing
+    unsafe
+      ObjC_SUUpdaterCheckForUpdates(mSharedUpdater, nothing)
+    end unsafe
   end handler
 
 
@@ -247,7 +272,10 @@ library community.lvecode.trevordevore.sparkle
 
 
   /**
-  Summary:
+  Summary: Returns whether to allow Sparkle to pop up.
+
+  Description:
+  This may be used to prevent Sparkle from interrupting a setup assistant.
   */
   public handler sparkleGetMayCheckForUpdates() returns Boolean
     unsafe
@@ -654,7 +682,8 @@ library community.lvecode.trevordevore.sparkle
           Delegate_SUUpdaterUserDidCancelDownload, \
           Delegate_SUUpdaterWillInstallUpdateOnQuit, \
           Delegate_SUUpdaterDidCancelInstallUpdateOnQuit, \
-          Delegate_SUUpdaterDidAbortWithError] into tForeignHandlers
+          Delegate_SUUpdaterDidAbortWithError, \
+          Delegate_SUUpdaterShouldPostponeRelaunchForUpdate] into tForeignHandlers
 
     put {"updater:didFinishLoadingAppcast:": DidFinishLoadingAppcast, \
           "updater:didFindValidUpdate:": DidFindValidUpdate, \
@@ -667,7 +696,8 @@ library community.lvecode.trevordevore.sparkle
           "userDidCancelDownload:": UserDidCancelDownload, \
           "updater:willInstallUpdateOnQuit:immediateInstallationInvocation:": WillInstallUpdateOnQuit, \
           "updater:didCancelInstallUpdateOnQuit:": DidCancelInstallUpdateOnQuit, \
-          "updater:didAbortWithError:": DidAbortWithError} into tMapping
+          "updater:didAbortWithError:": DidAbortWithError, \
+          "updagter:shouldPostponeRelaunchForUpdate:untilInvoking:": ShouldPostponeRelaunchForUpdate} into tMapping
 
     put CreateObjcInformalDelegate( \
               tForeignHandlers, \
@@ -761,6 +791,12 @@ library community.lvecode.trevordevore.sparkle
     end if
 
     post "sparkleDidAbortWithError" with [tError]
+  end handler
+
+  // TODO: Send callback to LCS which allows developer to return a Boolean.
+  private handler ShouldPostponeRelaunchForUpdate(in pUpdater as ObjcObject, in pAppCastItem as ObjcObject, in pNSInvocation as ObjcObject) returns Boolean
+    // "sparkleShouldPostponeRelaunchForUpdate"
+    return false
   end handler
 
 end library
