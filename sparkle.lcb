@@ -237,7 +237,7 @@ library community.lvecode.trevordevore.sparkle
 
   Returns: Seconds or empty if no check has been performed.
   */
-  public handler sparkleGetLastUpdateCheckDate() returns optional Number
+  public handler sparkleLastUpdateCheckDate() returns optional Number
     variable tNSDate as optional ObjcObject
     variable tSeconds as optional Number
 
@@ -255,7 +255,7 @@ library community.lvecode.trevordevore.sparkle
   /**
   Summary:
   */
-  public handler sparkleGetAutomaticallyChecksForUpdates() returns Boolean
+  public handler sparkleAutomaticallyChecksForUpdates() returns Boolean
     unsafe
       return ObjC_SUUpdaterAutomaticallyChecksForUpdates(mSharedUpdater)
     end unsafe
@@ -277,7 +277,7 @@ library community.lvecode.trevordevore.sparkle
   Description:
   This may be used to prevent Sparkle from interrupting a setup assistant.
   */
-  public handler sparkleGetMayCheckForUpdates() returns Boolean
+  public handler sparkleMayCheckForUpdates() returns Boolean
     unsafe
       return ObjC_SUUpdaterUpdaterMayCheckForUpdates(mSharedUpdater)
     end unsafe
@@ -297,7 +297,7 @@ library community.lvecode.trevordevore.sparkle
   /**
   Summary:
   */
-  public handler sparkleGetAutomaticallyDownloadsUpdates() returns Boolean
+  public handler sparkleAutomaticallyDownloadsUpdates() returns Boolean
     unsafe
       return ObjC_SUUpdaterAutomaticallyDownloadsUpdates(mSharedUpdater)
     end unsafe
@@ -317,7 +317,7 @@ library community.lvecode.trevordevore.sparkle
   /**
   Summary:
   */
-  public handler sparkleGetSendsSystemProfile() returns Boolean
+  public handler sparkleSendsSystemProfile() returns Boolean
     unsafe
       return ObjC_SUUpdaterSendsSystemProfile(mSharedUpdater)
     end unsafe
@@ -337,7 +337,7 @@ library community.lvecode.trevordevore.sparkle
   /**
   Summary:
   */
-  public handler sparkleGetUpdateInProgress() returns Boolean
+  public handler sparkleUpdateInProgress() returns Boolean
     unsafe
       return ObjC_SUUpdaterUpdateInProgress(mSharedUpdater)
     end unsafe
@@ -350,7 +350,7 @@ library community.lvecode.trevordevore.sparkle
   Description:
   You must specify the URL of the appcast as the `SUFeedURL` key in either the Info.plist or the user defaults.
   */
-  public handler sparkleGetParameterizedFeedUrl() returns String
+  public handler sparkleParameterizedFeedUrl() returns String
     variable tNSUrl as optional ObjcObject
     variable tFilename as optional ObjcObject
 
@@ -377,7 +377,7 @@ library community.lvecode.trevordevore.sparkle
 
   Returns: Array
   */
-  public handler sparkleGetHostBundle() returns Array
+  public handler sparkleHostBundle() returns Array
     variable tNSBundle as optional ObjcObject
     variable tBundle as Array
 
@@ -402,7 +402,7 @@ library community.lvecode.trevordevore.sparkle
 
   Returns: Array
   */
-  public handler sparkleGetSparkleBundle() returns Array
+  public handler sparkleSparkleBundle() returns Array
     variable tNSBundle as optional ObjcObject
     variable tBundle as Array
 
@@ -425,7 +425,7 @@ library community.lvecode.trevordevore.sparkle
   Description:
   You must specify the URL of the appcast as the `SUFeedURL` key in either the Info.plist or the user defaults.
   */
-  public handler sparkleGetFeedUrl() returns String
+  public handler sparkleFeedUrl() returns String
     variable tNSUrl as optional ObjcObject
     variable tFilename as optional ObjcObject
 
@@ -466,7 +466,7 @@ library community.lvecode.trevordevore.sparkle
   Summary:
 
   */
-  public handler sparkleGetUpdateCheckInterval() returns Number
+  public handler sparkleUpdateCheckInterval() returns Number
     unsafe
       return ObjC_SUUpdaterUpdateCheckInterval(mSharedUpdater)
     end unsafe
@@ -491,7 +491,7 @@ library community.lvecode.trevordevore.sparkle
   Summary:
 
   */
-  public handler sparkleGetUserAgentString() returns String
+  public handler sparkleUserAgentString() returns String
     variable tNSString as optional ObjcObject
 
     unsafe
@@ -524,7 +524,7 @@ library community.lvecode.trevordevore.sparkle
   Summary: Retruns the decryption password used for extracting updates shipped as Apple Disk Images (dmg).
 
   */
-  public handler sparkleGetDecryptionPassword() returns String
+  public handler sparkleDecryptionPassword() returns String
     variable tNSString as optional ObjcObject
 
     unsafe

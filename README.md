@@ -11,12 +11,12 @@ https://sparkle-project.org/documentation/#3-segue-for-security-concerns
 
 Once you have configured your Info.plist file with the `SUFeedURL` key you can use Sparkle to update your application. 
 
-According to the Sparkle documentation, the second time your application is launched Sparkle will ask the user if they want to check for updates. If they do then `sparkleGetAutomaticallyChecksForUpdates()` will return true. You can create a preference UI for this setting and call `sparkleSetAutomaticallyChecksForUpdates()` to update the setting.
+According to the Sparkle documentation, the second time your application is launched Sparkle will ask the user if they want to check for updates. If they do then `sparkleAutomaticallyChecksForUpdates()` will return true. You can create a preference UI for this setting and call `sparkleSetAutomaticallyChecksForUpdates()` to update the setting.
 
 ### Confirm that the feel url is set up correctly
 
 ```
-put sparkleGetFeedUrl()
+put sparkleFeedUrl()
 ```
 
 ### Check for updates from a "Check For Updates" menu item
