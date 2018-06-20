@@ -4,9 +4,9 @@ library community.lvecode.trevordevore.sparkle
   use com.livecode.objc
   use com.livecode.engine
 
-  metadata title is "Sparkle"
+  metadata title is "Sparkle macOS"
   metadata author is "TrevorDeVore"
-  metadata version is "0.0.1"
+  metadata version is "0.5.0"
 
   private foreign handler ObjC_SUUpdaterSharedUpdater() \
         returns ObjcId binds to "objc:Sparkle>SUUpdater.+sharedUpdater"
@@ -416,10 +416,10 @@ library community.lvecode.trevordevore.sparkle
   end handler
 
   /**
-  Summary: Set the feed url.
+  Summary: Sets the feed url.
 
   Description:
-  The feed url can be stored in the Info.plist file or in user defaults.
+  The feed url is usually stored in the Info.plist file.
   This handler can be used to set the value in the user defaults. The value you set
   it to will persist across app sessions.
   */
@@ -448,7 +448,7 @@ library community.lvecode.trevordevore.sparkle
   Summary: Sets the number of seconds between checks for updates.
 
   Description:
-  This handler updates the user defaults and the value will persist across sessions
+  This handler updates the user defaults (preferences) and the value will persist across sessions
   of the app.
 
   */
@@ -482,7 +482,7 @@ library community.lvecode.trevordevore.sparkle
 
   Description:
   This handler sets the user agent string that Sparkle sends to the server when it checks
-  for udpates. The value will persist for the current session of the application.
+  for updates. The value will persist for the current session of the application.
 
   */
   public handler sparkleSetUserAgentString(in pUserAgent as String) returns nothing
@@ -519,6 +519,121 @@ library community.lvecode.trevordevore.sparkle
     unsafe
       ObjC_SUUpdaterSetDecryptionPassword(mSharedUpdater, StringToNSString(pPassword))
     end unsafe
+  end handler
+
+  /* SUAppcast and SUAppcastItem */
+  private foreign handler ObjC_AppCastItems (in pAppCast as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcast.-items"
+
+  private foreign handler ObjC_AppCastItemTitle (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-title"
+  private foreign handler ObjC_AppCastItemDateString (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-dateString"
+  private foreign handler ObjC_AppCastItemDescription (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-itemDescription"
+  private foreign handler ObjC_AppCastItemDSASignature (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-DSASignature"
+  private foreign handler ObjC_AppCastItemMinimumSystemVersion (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-minimumSystemVersion"
+  private foreign handler ObjC_AppCastItemMaximumSystemVersion (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-maximumSystemVersion"
+  private foreign handler ObjC_AppCastItemVersionString (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-versionString"
+  private foreign handler ObjC_AppCastItemOSString (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-osString"
+  private foreign handler ObjC_AppCastItemDisplayVersionString (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-displayVersionString"
+  private foreign handler ObjC_AppCastItemReleaseNotesURL (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-releaseNotesURL"
+  private foreign handler ObjC_AppCastItemFileURL (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-fileURL"
+  private foreign handler ObjC_AppCastItemInfoURL (in pAppCastItem as ObjcId) returns ObjcId \
+        binds to "objc:SUAppcastItem.-infoURL"
+  private foreign handler ObjC_AppCastItemContentLength (in pAppCastItem as ObjcId) returns CUInt \
+        binds to "objc:SUAppcastItem.-contentLength"
+
+
+  private handler AppCastItemsToArray(in pAppCast as ObjcObject) returns Array
+    variable tItemsObj as optional ObjcObject
+    variable tItems as List
+    variable tItem as ObjcObject
+    variable tArray as Array
+    variable tAppCastItems as List
+
+    unsafe
+      put ObjC_AppCastItems(pAppCast) into tItemsObj
+      if tItemsObj is not nothing then
+        put ListFromNSArray(tItemsObj) into tItems
+      end if
+    end unsafe
+
+    repeat for each element tItem in tItems
+      push AppCastItemToArray(tItem) onto tAppCastItems
+    end repeat
+
+    return listToArray(tAppCastItems)
+  end handler
+
+
+  private handler AppCastItemToArray(in pAppCastItem as ObjcObject) returns Array
+    variable tItem as Array
+
+    unsafe
+      put _Str(ObjC_AppCastItemTitle(pAppCastItem)) into tItem["title"]
+      put _Str(ObjC_AppCastItemDateString(pAppCastItem)) into tItem["date"]
+      put _Str(ObjC_AppCastItemDescription(pAppCastItem)) into tItem["description"]
+      put _URLStr(ObjC_AppCastItemReleaseNotesURL(pAppCastItem)) into tItem["release notes url"]
+      put _Str(ObjC_AppCastItemDSASignature(pAppCastItem)) into tItem["dsa signature"]
+      put _Str(ObjC_AppCastItemMinimumSystemVersion(pAppCastItem)) into tItem["minimum system version"]
+      put _Str(ObjC_AppCastItemMaximumSystemVersion(pAppCastItem)) into tItem["maximum system version"]
+      put _URLStr(ObjC_AppCastItemFileURL(pAppCastItem)) into tItem["file url"]
+      put _Str(ObjC_AppCastItemVersionString(pAppCastItem)) into tItem["version"]
+      put _Str(ObjC_AppCastItemOSString(pAppCastItem)) into tItem["os"]
+      put _Str(ObjC_AppCastItemDisplayVersionString(pAppCastItem)) into tItem["display version"]
+      put _URLStr(ObjC_AppCastItemInfoURL(pAppCastItem)) into tItem["info url"]
+      put ObjC_AppCastItemContentLength(pAppCastItem) into tItem["content length"]
+    end unsafe
+
+    return tItem
+  end handler
+
+
+  private handler _Str(in pNSString as optional ObjcObject) returns String
+    if pNSString is not nothing then
+      return StringFromNSString(pNSString)
+    else
+      return ""
+    end if
+  end handler
+
+
+  private handler _URLStr(in pNSURL as optional ObjcObject) returns String
+    if pNSURL is not nothing then
+      variable tString as ObjcObject
+
+      unsafe
+        put ObjC_NSURLAbsoluteString(pNSURL) into tString
+      end unsafe
+
+      return StringFromNSString(tString)
+    else
+      return ""
+    end if
+  end handler
+
+
+  private handler listToArray(in pList as List) returns Array
+    variable tCount as Number
+    variable tArray as Array
+    variable tKey as String
+
+    repeat with tCount from 1 up to the number of elements in pList
+      put tCount formatted as string into tKey
+      put the empty array into tArray[tKey]
+      put element tCount of pList into tArray[tKey]
+    end repeat
+
+    return tArray
   end handler
 
 
@@ -564,57 +679,71 @@ library community.lvecode.trevordevore.sparkle
     end if
   end handler
 
-  private handler DidFinishLoadingAppcast(in pUpdater as ObjcId, in pAppcast as ObjcId) returns nothing
-    post "sparkleFinishedLoadingAppcast"
+  private handler DidFinishLoadingAppcast(in pUpdater as ObjcObject, in pAppcast as ObjcObject) returns nothing
+    variable tAppCastItems as Array
+
+    put AppCastItemsToArray(pAppcast) into tAppCastItems
+    post "sparkleFinishedLoadingAppcast" with [tAppCastItems]
   end handler
 
-  private handler DidFindValidUpdate(in pUpdater as ObjcId, in pAppcastItem as ObjcId) returns nothing
-    post "sparkleFoundUpdate"
+  private handler DidFindValidUpdate(in pUpdater as ObjcObject, in pAppcastItem as ObjcObject) returns nothing
+    variable tItem as Array
+
+    put AppCastItemToArray(pAppCastItem) into tItem
+    post "sparkleFoundUpdate" with [tItem]
   end handler
 
-  private handler DidNotFindUpdate(in pUpdater as ObjcId) returns nothing
+  private handler DidNotFindUpdate(in pUpdater as ObjcObject) returns nothing
     post "sparkleDidNotFindUpdate"
   end handler
 
-  private handler WillInstallUpdate(in pUpdater as ObjcId, in pAppcastItem as ObjcId) returns nothing
-    post "sparkleWillInstallUpdate"
+  private handler WillInstallUpdate(in pUpdater as ObjcObject, in pAppcastItem as ObjcObject) returns nothing
+    variable tItem as Array
+
+    put AppCastItemToArray(pAppCastItem) into tItem
+    post "sparkleWillInstallUpdate" with [tItem]
   end handler
 
-  private handler WillRelaunchApplication(in pUpdater as ObjcId) returns nothing
+  private handler WillRelaunchApplication(in pUpdater as ObjcObject) returns nothing
     post "sparkleWillRelaunchApplication"
   end handler
 
   // SUUpdater delegate must be set before applicationDidFinishLaunching: to catch this event.
   // I don't believe this will ever be sent.
-  private handler DidRelaunchApplication(in pUpdater as ObjcId) returns nothing
+  private handler DidRelaunchApplication(in pUpdater as ObjcObject) returns nothing
     post "sparkleDidRelaunchApplication"
   end handler
 
-  private handler WillShowModalAlert(in pUpdater as ObjcId) returns nothing
+  private handler WillShowModalAlert(in pUpdater as ObjcObject) returns nothing
     post "sparkleWillShowModalAlert"
   end handler
 
-  private handler DidShowModalAlert(in pUpdater as ObjcId) returns nothing
+  private handler DidShowModalAlert(in pUpdater as ObjcObject) returns nothing
     post "sparkleDidShowModalAlert"
   end handler
 
-  private handler UserDidCancelDownload(in pUpdater as ObjcId) returns nothing
+  private handler UserDidCancelDownload(in pUpdater as ObjcObject) returns nothing
     post "sparkleDownloadCanceledByUser"
   end handler
 
   // - (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(NSInvocation *)invocation;
-  private handler WillInstallUpdateOnQuit(in pUpdater as ObjcId, in pAppcastItem as ObjcId, in pNSInvocation as ObjcId) returns nothing
-    post "sparkleWillInstallUpdateOnQuit"
+  private handler WillInstallUpdateOnQuit(in pUpdater as ObjcObject, in pAppcastItem as ObjcObject, in pNSInvocation as ObjcObject) returns nothing
+    variable tItem as Array
+
+    put AppCastItemToArray(pAppCastItem) into tItem
+    post "sparkleWillInstallUpdateOnQuit" with [tItem]
   end handler
 
   // - (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)item;
-  private handler DidCancelInstallUpdateOnQuit(in pUpdater as ObjcId, in pAppcastItem as ObjcId) returns nothing
-    // TODO: Convert appcastitem to array that is passed as parameter
-    post "sparkelDidCancelInstallUpdateOnQuit"
+  private handler DidCancelInstallUpdateOnQuit(in pUpdater as ObjcObject, in pAppcastItem as ObjcObject) returns nothing
+    variable tItem as Array
+
+    put AppCastItemToArray(pAppCastItem) into tItem
+    post "sparkelDidCancelInstallUpdateOnQuit" with [tItem]
   end handler
 
   // - (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error;
-  private handler DidAbortWithError(in pUpdater as ObjcId, in pNSError as ObjcId) returns nothing
+  private handler DidAbortWithError(in pUpdater as ObjcObject, in pNSError as ObjcObject) returns nothing
     variable tFailureReason as optional ObjcObject
     variable tDescription as optional ObjcObject
     variable tError as Array
@@ -630,7 +759,6 @@ library community.lvecode.trevordevore.sparkle
     if tFailureReason is not nothing then
       put StringFromNSString(tFailureReason) into tError["failure reason"]
     end if
-    log tError
 
     post "sparkleDidAbortWithError" with [tError]
   end handler
