@@ -13,6 +13,8 @@ Once you have configured your Info.plist file with the `SUFeedURL` key you can u
 
 According to the Sparkle documentation, the second time your application is launched Sparkle will ask the user if they want to check for updates. If they do then `sparkleAutomaticallyChecksForUpdates()` will return true. You can create a preference UI for this setting and call `sparkleSetAutomaticallyChecksForUpdates()` to update the setting.
 
+If the user chooses to install an update the `sparklePreRelaunchForUpdate` message will be sent to your app. Perform any cleanup that you need to perform and then call `sparkleRelaunch()` to relaunch and perform the update.
+
 ### Confirm that the feel url is set up correctly
 
 ```
@@ -72,3 +74,4 @@ Some of the callbacks include a parameter that is an array representing an SUApp
 - `sparkleWillInstallUpdateOnQuit pAppcastItemArray`
 - `sparkelDidCancelInstallUpdateOnQuit pAppcastItemArray`
 - `sparkleDidAbortWithError pErrorArray`: pErrorArray contains `description` and `failure reason` keys. You can display the `description` key to users.
+- `sparklePreRelaunchForUpdate`

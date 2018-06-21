@@ -1,4 +1,4 @@
-library community.lvecode.trevordevore.sparkle
+library community.livecode.trevordevore.sparkle
 
   /*
   URLs of interest:
@@ -115,7 +115,7 @@ library community.lvecode.trevordevore.sparkle
         returns nothing binds to "objc:.-updater:didCancelInstallUpdateOnQuit:"
   foreign handler Delegate_SUUpdaterDidAbortWithError (in pDelegate as ObjcId, in pUpdater as ObjcId, in pNSError as ObjcId) \
         returns nothing binds to "objc:.-updater:didAbortWithError:"
-  foreign handler Delegate_SUUpdaterShouldPostponeRelaunchForUpdate (in pDelegate as ObjcId, in pAppCastItem as ObjcId, in pNSInvocation as ObjcId) \
+  foreign handler Delegate_SUUpdaterShouldPostponeRelaunchForUpdate (in pDelegate as ObjcId, in pUpdater as ObjcId, in pAppCastItem as ObjcId, in pNSInvocation as ObjcId) \
         returns CBool binds to "objc:.-updater:shouldPostponeRelaunchForUpdate:untilInvoking:"
 
   /* ADDITIONAL HELPERS */
@@ -142,9 +142,13 @@ library community.lvecode.trevordevore.sparkle
   private foreign handler ObjC_NSErrorLocalizedDescription(in pObj as ObjcId) \
         returns ObjcId binds to "objc:NSError.-localizedDescription"
 
+  private foreign handler ObjC_NSInvocationInvoke(in pObj as ObjcId) \
+        returns nothing binds to "objc:NSInvocation.-invoke"
+
   /* VARIABLES */
   variable mSharedUpdater as optional ObjcObject
   variable mSUUpdaterDelegate as optional ObjcObject
+  variable mNSInvocation as optional ObjcObject
 
 
   /* PUBLIC HANDLERS */
@@ -216,6 +220,24 @@ library community.lvecode.trevordevore.sparkle
     unsafe
       ObjC_SUUpdaterCheckForUpdateInformation(mSharedUpdater)
     end unsafe
+  end handler
+
+
+  /**
+  Summary: Restarts your application after your app has received the `sparklePreRelaunchForUpdate` message.
+
+  Description:
+  When Sparkle is ready to update your application it will send the `sparklePreRelaunchForUpdate` message.
+  Your application should perform any necessary cleanup and then call this handler to quit and install
+  the update.
+  */
+  public handler sparkleRelaunch() returns nothing
+    if mNSInvocation is not nothing then
+      unsafe
+        ObjC_NSInvocationInvoke(mNSInvocation)
+      end unsafe
+      put nothing into mNSInvocation
+    end if
   end handler
 
 
@@ -697,7 +719,7 @@ library community.lvecode.trevordevore.sparkle
           "updater:willInstallUpdateOnQuit:immediateInstallationInvocation:": WillInstallUpdateOnQuit, \
           "updater:didCancelInstallUpdateOnQuit:": DidCancelInstallUpdateOnQuit, \
           "updater:didAbortWithError:": DidAbortWithError, \
-          "updagter:shouldPostponeRelaunchForUpdate:untilInvoking:": ShouldPostponeRelaunchForUpdate} into tMapping
+          "updater:shouldPostponeRelaunchForUpdate:untilInvoking:": ShouldPostponeRelaunchForUpdate} into tMapping
 
     put CreateObjcInformalDelegate( \
               tForeignHandlers, \
@@ -793,10 +815,21 @@ library community.lvecode.trevordevore.sparkle
     post "sparkleDidAbortWithError" with [tError]
   end handler
 
-  // TODO: Send callback to LCS which allows developer to return a Boolean.
-  private handler ShouldPostponeRelaunchForUpdate(in pUpdater as ObjcObject, in pAppCastItem as ObjcObject, in pNSInvocation as ObjcObject) returns Boolean
-    // "sparkleShouldPostponeRelaunchForUpdate"
-    return false
-  end handler
+  /**
+  Summary: Notifies developer that relaunch should occur.
 
+  Description:
+  This handler stores the NSInvocation and notifies the developer that Sparkle wants to relaunch by
+  dispatching `sparklePreRelaunchForUpdate`. The developer can then call `sparkleRelaunch` when
+  the app should actually relaunch.
+  */
+  private handler ShouldPostponeRelaunchForUpdate(in pUpdater as ObjcObject, in pAppCastItem as ObjcObject, in pNSInvocation as ObjcObject) returns Boolean
+    if mNSInvocation is not nothing then
+      put nothing into mNSInvocation
+    end if
+
+    put pNSInvocation into mNSInvocation
+    post "sparklePreRelaunchForUpdate"
+    return true
+  end handler
 end library
