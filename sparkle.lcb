@@ -92,31 +92,31 @@ library community.livecode.trevordevore.sparkle
 
   /* FOREIGN HANDLERS FOR DELEGATES */
   foreign handler Delegate_SUUpdaterDidFinishLoadingAppcast (in pDelegate as ObjcId, in pUpdater as ObjcId, in pAppcast as ObjcId) \
-        returns nothing binds to "objc:.-updater:didFinishLoadingAppcast:"
+        returns nothing binds to "objc:Sparkle>.-updater:didFinishLoadingAppcast:"
   foreign handler Delegate_SUUpdaterDidFindValidUpdate (in pDelegate as ObjcId, in pUpdater as ObjcId, in pAppcastItem as ObjcId) \
-        returns nothing binds to "objc:.-updater:didFindValidUpdate:"
+        returns nothing binds to "objc:Sparkle>.-updater:didFindValidUpdate:"
   foreign handler Delegate_SUUpdaterDidNotFindUpdate (in pDelegate as ObjcId, in pUpdater as ObjcId) \
-        returns nothing binds to "objc:.-updaterDidNotFindUpdate:"
+        returns nothing binds to "objc:Sparkle>.-updaterDidNotFindUpdate:"
   foreign handler Delegate_SUUpdaterWillInstallUpdate (in pDelegate as ObjcId, in pUpdater as ObjcId, in pAppcastItem as ObjcId) \
-        returns nothing binds to "objc:.-updater:willInstallUpdate:"
+        returns nothing binds to "objc:Sparkle>.-updater:willInstallUpdate:"
   foreign handler Delegate_SUUpdaterWillRelaunchApplication (in pDelegate as ObjcId, in pUpdater as ObjcId) \
-        returns nothing binds to "objc:.-updaterWillRelaunchApplication:"
+        returns nothing binds to "objc:Sparkle>.-updaterWillRelaunchApplication:"
   foreign handler Delegate_SUUpdaterDidRelaunchApplication (in pDelegate as ObjcId, in pUpdater as ObjcId) \
-        returns nothing binds to "objc:.-updaterDidRelaunchApplication:"
+        returns nothing binds to "objc:Sparkle>.-updaterDidRelaunchApplication:"
   foreign handler Delegate_SUUpdaterWillShowModalAlert (in pDelegate as ObjcId, in pUpdater as ObjcId) \
-        returns nothing binds to "objc:.-updaterWillShowModalAlert:"
+        returns nothing binds to "objc:Sparkle>.-updaterWillShowModalAlert:"
   foreign handler Delegate_SUUpdaterDidShowModalAlert (in pDelegate as ObjcId, in pUpdater as ObjcId) \
-        returns nothing binds to "objc:.-updaterDidShowModalAlert:"
+        returns nothing binds to "objc:Sparkle>.-updaterDidShowModalAlert:"
   foreign handler Delegate_SUUpdaterUserDidCancelDownload (in pDelegate as ObjcId, in pUpdater as ObjcId) \
-        returns nothing binds to "objc:.-userDidCancelDownload:"
+        returns nothing binds to "objc:Sparkle>.-userDidCancelDownload:"
   foreign handler Delegate_SUUpdaterWillInstallUpdateOnQuit (in pDelegate as ObjcId, in pUpdater as ObjcId, in pAppcastItem as ObjcId, in pImmediateInvocation as ObjcId) \
-        returns nothing binds to "objc:.-updater:willInstallUpdateOnQuit:immediateInstallationInvocation:"
+        returns nothing binds to "objc:Sparkle>.-updater:willInstallUpdateOnQuit:immediateInstallationInvocation:"
   foreign handler Delegate_SUUpdaterDidCancelInstallUpdateOnQuit (in pDelegate as ObjcId, in pUpdater as ObjcId, in pAppcastItem as ObjcId) \
-        returns nothing binds to "objc:.-updater:didCancelInstallUpdateOnQuit:"
+        returns nothing binds to "objc:Sparkle>.-updater:didCancelInstallUpdateOnQuit:"
   foreign handler Delegate_SUUpdaterDidAbortWithError (in pDelegate as ObjcId, in pUpdater as ObjcId, in pNSError as ObjcId) \
-        returns nothing binds to "objc:.-updater:didAbortWithError:"
+        returns nothing binds to "objc:Sparkle>.-updater:didAbortWithError:"
   foreign handler Delegate_SUUpdaterShouldPostponeRelaunchForUpdate (in pDelegate as ObjcId, in pUpdater as ObjcId, in pAppCastItem as ObjcId, in pNSInvocation as ObjcId) \
-        returns CBool binds to "objc:.-updater:shouldPostponeRelaunchForUpdate:untilInvoking:"
+        returns CBool binds to "objc:Sparkle>.-updater:shouldPostponeRelaunchForUpdate:untilInvoking:"
 
   /* ADDITIONAL HELPERS */
   private foreign handler ObjC_NSURLAlloc() \
