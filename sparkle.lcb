@@ -44,11 +44,6 @@ library community.livecode.trevordevore.sparkle
   private foreign handler ObjC_SUUpdaterSetAutomaticallyChecksForUpdates (in pSUUpdater as ObjcId, in pBool as CBool) \
         returns nothing binds to "objc:Sparkle>SUUpdater.-setAutomaticallyChecksForUpdates:"
 
-  private foreign handler ObjC_SUUpdaterUpdaterMayCheckForUpdates (in pSUUpdater as ObjcId) \
-        returns CBool binds to "objc:Sparkle>SUUpdater.-updaterMayCheckForUpdates"
-  private foreign handler ObjC_SUUpdaterSetUpdaterMayCheckForUpdates (in pSUUpdater as ObjcId, in pBool as CBool) \
-        returns nothing binds to "objc:Sparkle>SUUpdater.-setUpdaterMayCheckForUpdates:"
-
   private foreign handler ObjC_SUUpdaterAutomaticallyDownloadsUpdates (in pSUUpdater as ObjcId) \
         returns CBool binds to "objc:Sparkle>SUUpdater.-automaticallyDownloadsUpdates"
   private foreign handler ObjC_SUUpdaterSetAutomaticallyDownloadsUpdates (in pSUUpdater as ObjcId, in pBool as CBool) \
@@ -117,6 +112,8 @@ library community.livecode.trevordevore.sparkle
         returns nothing binds to "objc:Sparkle>.-updater:didAbortWithError:"
   foreign handler Delegate_SUUpdaterShouldPostponeRelaunchForUpdate (in pDelegate as ObjcId, in pUpdater as ObjcId, in pAppCastItem as ObjcId, in pNSInvocation as ObjcId) \
         returns CBool binds to "objc:Sparkle>.-updater:shouldPostponeRelaunchForUpdate:untilInvoking:"
+  foreign handler Delegate_SUUpdaterUpdaterMayCheckForUpdates (in pDelegate as ObjcId, in pUpdater as ObjcId) \
+        returns CBool binds to "objc:Sparkle>.-updaterMayCheckForUpdates:"
 
   /* ADDITIONAL HELPERS */
   private foreign handler ObjC_NSURLAlloc() \
@@ -150,6 +147,7 @@ library community.livecode.trevordevore.sparkle
   variable mSharedUpdater as optional ObjcObject
   variable mSUUpdaterDelegate as optional ObjcObject
   variable mNSInvocation as optional ObjcObject
+  variable mMayCheckForUpdates as Boolean
 
 
   /* PUBLIC HANDLERS */
@@ -165,6 +163,8 @@ library community.livecode.trevordevore.sparkle
   */
   public handler sparkleInitialize() returns nothing
     if mSharedUpdater is nothing then
+      put true into mMayCheckForUpdates
+
       unsafe
         put ObjC_SUUpdaterSharedUpdater() into mSharedUpdater
         SetSUUpdaterInformalDelegate(mSharedUpdater)
@@ -301,9 +301,7 @@ library community.livecode.trevordevore.sparkle
   This may be used to prevent Sparkle from interrupting a setup assistant.
   */
   public handler sparkleMayCheckForUpdates() returns Boolean
-    unsafe
-      return ObjC_SUUpdaterUpdaterMayCheckForUpdates(mSharedUpdater)
-    end unsafe
+    return mMayCheckForUpdates
   end handler
 
   /**
@@ -311,9 +309,7 @@ library community.livecode.trevordevore.sparkle
 
   */
   public handler sparkleSetMayCheckForUpdates(in pBoolean as Boolean) returns nothing
-    unsafe
-      ObjC_SUUpdaterSetUpdaterMayCheckForUpdates(mSharedUpdater, pBoolean)
-    end unsafe
+    put pBoolean into mMayCheckForUpdates
   end handler
 
 
@@ -708,7 +704,8 @@ library community.livecode.trevordevore.sparkle
           Delegate_SUUpdaterWillInstallUpdateOnQuit, \
           Delegate_SUUpdaterDidCancelInstallUpdateOnQuit, \
           Delegate_SUUpdaterDidAbortWithError, \
-          Delegate_SUUpdaterShouldPostponeRelaunchForUpdate] into tForeignHandlers
+          Delegate_SUUpdaterShouldPostponeRelaunchForUpdate, \
+          Delegate_SUUpdaterUpdaterMayCheckForUpdates] into tForeignHandlers
 
     put {"updater:didFinishLoadingAppcast:": DidFinishLoadingAppcast, \
           "updater:didFindValidUpdate:": DidFindValidUpdate, \
@@ -722,7 +719,8 @@ library community.livecode.trevordevore.sparkle
           "updater:willInstallUpdateOnQuit:immediateInstallationInvocation:": WillInstallUpdateOnQuit, \
           "updater:didCancelInstallUpdateOnQuit:": DidCancelInstallUpdateOnQuit, \
           "updater:didAbortWithError:": DidAbortWithError, \
-          "updater:shouldPostponeRelaunchForUpdate:untilInvoking:": ShouldPostponeRelaunchForUpdate} into tMapping
+          "updater:shouldPostponeRelaunchForUpdate:untilInvoking:": ShouldPostponeRelaunchForUpdate, \
+          "updaterMayCheckForUpdates:": UpdaterMayCheckForUpdates} into tMapping
 
     put CreateObjcInformalDelegate( \
               tForeignHandlers, \
@@ -735,17 +733,17 @@ library community.livecode.trevordevore.sparkle
   end handler
 
   private handler DidFinishLoadingAppcast(in pUpdater as ObjcObject, in pAppcast as ObjcObject) returns nothing
-    variable tAppCastItems as Array
+    -- variable tAppCastItems as Array
 
-    put AppCastItemsToArray(pAppcast) into tAppCastItems
-    post "sparkleFinishedLoadingAppcast" with [tAppCastItems]
+    -- put AppCastItemsToArray(pAppcast) into tAppCastItems
+    -- post "sparkleFinishedLoadingAppcast" with [tAppCastItems]
   end handler
 
   private handler DidFindValidUpdate(in pUpdater as ObjcObject, in pAppcastItem as ObjcObject) returns nothing
-    variable tItem as Array
+    -- variable tItem as Array
 
-    put AppCastItemToArray(pAppCastItem) into tItem
-    post "sparkleFoundUpdate" with [tItem]
+    -- put AppCastItemToArray(pAppCastItem) into tItem
+    -- post "sparkleFoundUpdate" with [tItem]
   end handler
 
   private handler DidNotFindUpdate(in pUpdater as ObjcObject) returns nothing
@@ -753,10 +751,10 @@ library community.livecode.trevordevore.sparkle
   end handler
 
   private handler WillInstallUpdate(in pUpdater as ObjcObject, in pAppcastItem as ObjcObject) returns nothing
-    variable tItem as Array
+    -- variable tItem as Array
 
-    put AppCastItemToArray(pAppCastItem) into tItem
-    post "sparkleWillInstallUpdate" with [tItem]
+    -- put AppCastItemToArray(pAppCastItem) into tItem
+    -- post "sparkleWillInstallUpdate" with [tItem]
   end handler
 
   private handler WillRelaunchApplication(in pUpdater as ObjcObject) returns nothing
@@ -783,18 +781,18 @@ library community.livecode.trevordevore.sparkle
 
   // - (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(NSInvocation *)invocation;
   private handler WillInstallUpdateOnQuit(in pUpdater as ObjcObject, in pAppcastItem as ObjcObject, in pNSInvocation as ObjcObject) returns nothing
-    variable tItem as Array
+    -- variable tItem as Array
 
-    put AppCastItemToArray(pAppCastItem) into tItem
-    post "sparkleWillInstallUpdateOnQuit" with [tItem]
+    -- put AppCastItemToArray(pAppCastItem) into tItem
+    -- post "sparkleWillInstallUpdateOnQuit" with [tItem]
   end handler
 
   // - (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)item;
   private handler DidCancelInstallUpdateOnQuit(in pUpdater as ObjcObject, in pAppcastItem as ObjcObject) returns nothing
-    variable tItem as Array
+    -- variable tItem as Array
 
-    put AppCastItemToArray(pAppCastItem) into tItem
-    post "sparkelDidCancelInstallUpdateOnQuit" with [tItem]
+    -- put AppCastItemToArray(pAppCastItem) into tItem
+    -- post "sparkelDidCancelInstallUpdateOnQuit" with [tItem]
   end handler
 
   // - (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error;
@@ -834,5 +832,16 @@ library community.livecode.trevordevore.sparkle
     put pNSInvocation into mNSInvocation
     post "sparklePreRelaunchForUpdate"
     return true
+  end handler
+
+
+  /**
+  Summary: Returns whether to allow Sparkle to pop up.
+
+  Description:
+  For example, this may be used to prevent Sparkle from interrupting a setup assistant.
+  */
+  private handler UpdaterMayCheckForUpdates(in pUpdater as ObjcObject) returns Boolean
+    return mMayCheckForUpdates
   end handler
 end library
