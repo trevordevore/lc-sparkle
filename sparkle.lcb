@@ -11,7 +11,7 @@ library community.livecode.trevordevore.sparkle
   use com.livecode.objc
   use com.livecode.engine
 
-  metadata title is "Sparkle macOS"
+  metadata title is "Sparkle"
   metadata author is "TrevorDeVore"
   metadata version is "0.5.0"
 
@@ -393,7 +393,7 @@ library community.livecode.trevordevore.sparkle
 
 
   /**
-  Summary: Returns an arrya containing info about the Host bundle (your app).
+  Summary: Returns an array containing info about the Host bundle (your app).
 
   Description:
   Returns an array with `url`, `path`, and `identifier` keys.
