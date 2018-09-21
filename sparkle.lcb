@@ -121,10 +121,11 @@ library community.livecode.trevordevore.sparkle
   /* ADDITIONAL HELPERS */
   private foreign handler ObjC_NSURLAlloc() \
         returns ObjcRetainedId binds to "objc:NSURL.+alloc"
+  private foreign handler ObjC_NSURLInitWithString(in pObj as ObjcRetainedId, in pUrl as ObjcId) \
+        returns optional ObjcRetainedId binds to "objc:NSURL.-initWithString:"
   private foreign handler ObjC_NSURLAbsoluteString(in pNSURL as ObjcId) \
         returns ObjcId binds to "objc:NSURL.-absoluteString"
-  private foreign handler ObjC_NSURLInitWithString(in pObj as ObjcId, in pUrl as ObjcId) \
-        returns ObjcId binds to "objc:NSURL.-initWithString:"
+
   private foreign handler ObjC_NSDateTimeIntervalSince1970(in pObj as ObjcId) \
         returns CDouble binds to "objc:NSDate.-timeIntervalSince1970"
 
@@ -479,7 +480,9 @@ library community.livecode.trevordevore.sparkle
     unsafe
       put ObjC_NSURLAlloc() into tNSUrl
       put ObjC_NSURLInitWithString(tNSUrl, StringToNSString(pUrl)) into tNSUrl
-      ObjC_SUUpdaterSetFeedURL(mSharedUpdater, tNSUrl)
+      if tNSUrl is not nothing then
+        ObjC_SUUpdaterSetFeedURL(mSharedUpdater, tNSUrl)
+      end if
     end unsafe
   end handler
 
