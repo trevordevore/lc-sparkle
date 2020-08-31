@@ -827,12 +827,15 @@ library community.livecode.trevordevore.sparkle
   the app should actually relaunch.
   */
   private handler ShouldPostponeRelaunchForUpdate(in pUpdater as ObjcObject, in pAppCastItem as ObjcObject, in pNSInvocation as ObjcObject) returns Boolean
+    variable tItem as Array
+
     if mNSInvocation is not nothing then
       put nothing into mNSInvocation
     end if
 
     put pNSInvocation into mNSInvocation
-    post "sparklePreRelaunchForUpdate"
+    put AppCastItemToArray(pAppCastItem) into tItem
+    post "sparklePreRelaunchForUpdate" with [tItem]
     return true
   end handler
 
